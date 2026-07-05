@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trail packing checklist</title>
+<style>
+  :root{
+    --ink:#232320;
+    --parchment:#F2ECDD;
+    --card:#FBF8F0;
+    --spruce:#2C4A3E;
+    --spruce-light:#e4ece8;
+    --amber:#B5651D;
+    --amber-light:#f5e3d1;
+    --line:#d8d0bd;
+    --muted:#6f6a5c;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family: 'Source Sans Pro', 'Segoe UI', Arial, sans-serif;
+    background: var(--parchment);
+    color: var(--ink);
+    padding: 24px 16px 60px;
+  }
+  .wrap{max-width:720px;margin:0 auto;}
+  header{margin-bottom:20px;}
+  h1{
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 26px;
+    margin: 0 0 4px;
+    letter-spacing: 0.3px;
+  }
+  .sub{color:var(--muted);font-size:14px;margin:0;}
+
+  .progress-shell{
+    margin: 18px 0 26px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .progress-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;}
+  .progress-top .num{font-size:20px;font-weight:600;color:var(--spruce);}
+  .progress-top .label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;}
+  .trail{
+    position:relative;
+    height:14px;
+    background: repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 14px);
+    background-color:#eae3cf;
+    border-radius:7px;
+    overflow:hidden;
+    border:1px solid var(--line);
+  }
+  .trail-fill{
+    height:100%;
+    background: var(--spruce);
+    width:0%;
+    transition: width 0.3s ease;
+  }
+
+  .reset-row{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;margin-bottom:6px;}
+  .save-btn{
+    background: var(--spruce);
+    border: 1px solid var(--spruce);
+    color: var(--parchment);
+    font-size:12px;
+    padding:5px 10px;
+    border-radius:6px;
+    cursor:pointer;
+  }
+  .save-btn:hover{opacity:0.9;}
+  .reset-btn{
+    background:none;border:1px solid var(--line);color:var(--muted);
+    font-size:12px;padding:5px 10px;border-radius:6px;cursor:pointer;
+  }
+  .reset-btn:hover{background:var(--card);}
+
+  .section{
+    margin-bottom: 22px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow:hidden;
+  }
+  .section-head{
+    background: var(--spruce);
+    color: var(--parchment);
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight:600;
+    letter-spacing:0.04em;
+    text-transform: uppercase;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .section-head .count{font-weight:400;font-size:12px;opacity:0.85;text-transform:none;letter-spacing:0;}
+  .optional-label{
+    font-size:11px;
+    text-transform:uppercase;
+    color:var(--amber);
+    letter-spacing:0.06em;
+    padding: 10px 16px 0;
+    font-weight:600;
+  }
+
+  .item{
+    display:grid;
+    grid-template-columns: 26px 1fr auto;
+    gap: 10px 12px;
+    align-items:start;
+    padding: 12px 16px;
+    border-top: 1px solid var(--line);
+  }
+  .item:first-of-type{border-top:none;}
+  .item.checked{background: var(--spruce-light);}
+
+  .item input[type=checkbox]{
+    width:20px;height:20px;
+    margin-top:2px;
+    accent-color: var(--spruce);
+    cursor:pointer;
+  }
+  .item-main{min-width:0;}
+  .item-name{
+    font-weight:600;
+    font-size:15px;
+  }
+  .item-name.checked{
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+  .item-meta{
+    font-size:12px;
+    color: var(--muted);
+    margin-top:2px;
+  }
+  .item-comment{
+    font-size:13px;
+    color:#4a473d;
+    margin-top:4px;
+    line-height:1.4;
+  }
+  .qty-pill{
+    display:inline-block;
+    background: var(--amber-light);
+    color: var(--amber);
+    font-size:11px;
+    font-weight:600;
+    padding:2px 8px;
+    border-radius:999px;
+    margin-right:6px;
+  }
+  .alt-toggle{
+    font-size:12px;
+    color: var(--spruce);
+    background:none;
+    border:none;
+    cursor:pointer;
+    padding:0;
+    margin-top:6px;
+    text-decoration: underline;
+  }
+  .alt-box{
+    display:none;
+    margin-top:8px;
+  }
+  .alt-box.open{display:block;}
+  .alt-box input{
+    width:100%;
+    max-width:260px;
+    font-size:13px;
+    padding:6px 8px;
+    border:1px solid var(--line);
+    border-radius:6px;
+    background:#fff;
+    color: var(--ink);
+  }
+  .alt-box input::placeholder{color:#a9a390;}
+
+  .notice{
+    background: var(--amber-light);
+    border: 1px solid #e0b98a;
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 13px;
+    margin: 24px 0;
+    color: #6b3d10;
+  }
+  .notice strong{display:block;margin-bottom:6px;font-size:13px;}
+
+  .save-note{
+    text-align:center;
+    font-size:12px;
+    color: var(--muted);
+    margin-top: -6px;
+    margin-bottom: 18px;
+    min-height:16px;
+  }
+
+  @media (max-width:480px){
+    h1{font-size:22px;}
+    .item{grid-template-columns: 22px 1fr;}
+    .item > .item-side{grid-column: 2; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Trail packing checklist</h1>
+    <p class="sub">Check items off as you pack. Tap "add alternative" if you're swapping something in.</p>
+  </header>
+
+  <div class="reset-row">
+    <button class="save-btn" id="saveBtn">Save all</button>
+    <button class="reset-btn" id="exportBtn">Export backup</button>
+    <button class="reset-btn" id="importBtn">Import backup</button>
+    <input type="file" id="importFile" accept="application/json" style="display:none;">
+    <button class="reset-btn" id="resetBtn">Reset all checks</button>
+  </div>
+
+  <div class="progress-shell">
+    <div class="progress-top">
+      <span class="num" id="progressNum">0 / 0 packed</span>
+      <span class="label">Pack progress</span>
+    </div>
+    <div class="trail"><div class="trail-fill" id="trailFill"></div></div>
+  </div>
+
+  <div class="save-note" id="saveNote">&nbsp;</div>
+
+  <div id="sections"></div>
+
+  <div class="notice">
+    <strong>Not allowed on this trek</strong>
+    Deodorant, radios / bluetooth speakers / video game devices, hammocks, turkey bags, bear bag pulley systems, bear spray, bear horns, drones, fireworks, drugs and alcohol.
+  </div>
+</div>
+
+<script>
+const DATA = [
+  {
+    name: "Backpacking gear",
+    items: [
+      {n:"Backpack", q:"1", c:"Large enough for personal gear plus your share of crew gear. 65–75L recommended."},
+      {n:"Pack cover", q:"1", c:"Waterproof, durable, fits over full pack."},
+      {n:"Sleeping bag", q:"1", c:"Comfort rating of 20°F and under 5 lbs recommended."},
+      {n:"Waterproof stuff sack", q:"1", c:"For sleeping bag. Or use a compression sack lined with a plastic bag."},
+      {n:"Sleeping pad", q:"1", c:"Padding and insulation from the ground."},
+      {n:"Headlamp or flashlight", q:"1", c:"Durable and lightweight. Bring extra batteries."},
+    ],
+    optional: [
+      {n:"Trekking poles", q:"", c:"Use rubber tips to prevent soil erosion."},
+      {n:"Sleeping bag liner", q:"1", c:""},
+      {n:"Pillow", q:"", c:"Small, packable."},
+    ]
+  },
+  {
+    name: "Food and water",
+    items: [
+      {n:"Bowl", q:"1", c:"Deep bowl of lightweight material."},
+      {n:"Utensils", q:"1", c:"Only a spoon or spork is recommended."},
+      {n:"Water bottles & reservoir", q:"4+ L", c:"At least 4L personal capacity, any combo of bottle or reservoir."},
+      {n:"Extra water capacity", q:"2", c:"Collapsible bottles for dry camps, 2L recommended."},
+      {n:"Mug / cup", q:"1", c:"12–20 oz, measuring style recommended."},
+    ]
+  },
+  {
+    name: "Clothing and footwear",
+    items: [
+      {n:"Underwear", q:"3–6 pr", c:"Moisture-wicking."},
+      {n:"T-shirt", q:"2", c:"Moisture-wicking, avoid cotton."},
+      {n:"Long sleeve shirt", q:"1", c:"Moisture-wicking, avoid cotton."},
+      {n:"Pants / shorts", q:"2", c:"Quick drying. Pants needed for certain programs including conservation."},
+      {n:"Boots", q:"1 pr", c:"Sturdy, supportive, broken in. Trail runners accepted, ankle-supporting boots highly recommended."},
+      {n:"Socks", q:"3–4 pr", c:"Wool or synthetic, not cotton. Liners optional."},
+      {n:"Camp / stream shoes", q:"1 pr", c:"Used in camp, stream crossings, some backcountry programs."},
+      {n:"Sleep clothes", q:"1 set", c:"Only worn in sleeping bag. Lightweight t-shirt and gym shorts recommended."},
+    ],
+    optional: [
+      {n:"Long underwear", q:"1", c:"Mid-weight synthetic top and/or bottoms, for cold mornings or nights."},
+    ]
+  },
+  {
+    name: "Rain and cold weather",
+    items: [
+      {n:"Rain jacket", q:"1", c:"Durable rain gear highly recommended."},
+      {n:"Rain pants", q:"1", c:"Vital for warmth in heavy rain."},
+      {n:"Lightweight fleece", q:"1", c:"Lightest and warmest available. Wool sweater or fleece pullover."},
+      {n:"Gloves", q:"1 pr", c:"Recommended for cold / summit days."},
+      {n:"Warm hat", q:"1", c:"For sleeping and cold / summit days."},
+      {n:"Insulated jacket", q:"1", c:"Packable down, synthetic puffy, or fleece. Expect lows in 30s at elevation."},
+    ]
+  },
+  {
+    name: "Health and hygiene",
+    items: [
+      {n:"Toothbrush and toothpaste", q:"1", c:"Larger tubes may be considered crew gear."},
+      {n:"Prescription medications", q:"", c:"In-date, enough for entire trek."},
+      {n:"Camp towel", q:"1", c:"Small, quick drying."},
+    ],
+    optional: [
+      {n:"Contacts / extra solution", q:"", c:"Multiple pairs if needed, enough solution for entire trek. Bring glasses as backup."},
+      {n:"Foot powder", q:"", c:"Soothes tired feet, absorbs moisture, reduces blisters."},
+    ]
+  },
+  {
+    name: "Sun protection",
+    items: [
+      {n:"Hat", q:"1", c:"Wide brim or baseball, protects ears and face."},
+      {n:"Sunglasses", q:"1", c:"Protect eyes and reduce eye strain."},
+      {n:"Lip balm", q:"1", c:"Moisturizing, SPF 25 or more."},
+    ]
+  },
+  {
+    name: "Miscellaneous",
+    items: [
+      {n:"Ditty bags / resealable bags", q:"6–10", c:"For packing, keeping clothes dry, laundry, pack organization."},
+      {n:"Whistle", q:"1", c:"For emergency use / signaling."},
+    ],
+    optional: [
+      {n:"Daypack", q:"1", c:"For summit days and side hikes."},
+      {n:"Bandana / tubular headgear", q:"2", c:"Washcloth, hot pot holder, and other uses."},
+      {n:"Lashing straps", q:"2", c:"Hold sleeping bag and gear on pack."},
+      {n:"Pocketknife", q:"", c:"A few per crew is sufficient."},
+      {n:"Money", q:"$20–50", c:"Small bills. Backcountry trading posts have items.", noAlt:true},
+      {n:"Watch", q:"1", c:"Several per crew is sufficient."},
+    ]
+  },
+  {
+    name: "Extras & entertainment",
+    items: [
+      {n:"Camera", q:"1", c:"Batteries and memory card."},
+      {n:"Fishing equipment", q:"1", c:"Some itineraries have fishing. Obtain a NM state fishing license."},
+      {n:"Postcards", q:"1+", c:"Pre-stamped. Mailing available on trek."},
+      {n:"Notepad & pen", q:"1", c:"For journals or emergency messages."},
+      {n:"Cards or games", q:"", c:"For entertainment."},
+      {n:"Camp chair", q:"", c:"Helpful for a backrest and/or elevating your feet."},
+    ]
+  },
+  {
+    name: "Crew-provided equipment",
+    items: [
+      {n:"Sewing kit", q:"1", c:"Heavy thread & needle to repair pack, tents, clothing."},
+      {n:"Tent stakes", q:"5/person", c:"Philmont tents need 8, dining fly needs 8."},
+      {n:"Backpacking stove", q:"2", c:"White gas or isobutane. Needs a wide, low base."},
+      {n:"Stove fuel", q:"2", c:"2x 20oz white gas bottles, or 3x 8oz isobutane canisters recommended."},
+    ]
+  },
+];
+
+const sectionsEl = document.getElementById('sections');
+const state = {};
+let idCounter = 0;
+
+function buildItem(item, sectionIdx, group){
+  const id = 'i' + (idCounter++);
+  item._id = id;
+  state[id] = {checked:false, alt:''};
+
+  const row = document.createElement('div');
+  row.className = 'item';
+  row.id = 'row-' + id;
+
+  const cb = document.createElement('input');
+  cb.type = 'checkbox';
+  cb.id = 'cb-' + id;
+  cb.addEventListener('change', () => {
+    state[id].checked = cb.checked;
+    row.classList.toggle('checked', cb.checked);
+    nameEl.classList.toggle('checked', cb.checked);
+    saveState();
+    updateProgress();
+  });
+
+  const main = document.createElement('div');
+  main.className = 'item-main';
+
+  const nameEl = document.createElement('div');
+  nameEl.className = 'item-name';
+  nameEl.innerHTML = (item.q ? `<span class="qty-pill">${item.q}</span>` : '') + item.n;
+
+  main.appendChild(nameEl);
+
+  if(item.c){
+    const cm = document.createElement('div');
+    cm.className = 'item-comment';
+    cm.textContent = item.c;
+    main.appendChild(cm);
+  }
+
+  if(!item.noAlt){
+    const toggle = document.createElement('button');
+    toggle.className = 'alt-toggle';
+    toggle.type = 'button';
+    toggle.textContent = '+ add alternative';
+
+    const altBox = document.createElement('div');
+    altBox.className = 'alt-box';
+    const altInput = document.createElement('input');
+    altInput.type = 'text';
+    altInput.placeholder = "What are you bringing instead?";
+    altInput.addEventListener('input', () => {
+      state[id].alt = altInput.value;
+      saveState();
+    });
+    altBox.appendChild(altInput);
+
+    toggle.addEventListener('click', () => {
+      const open = altBox.classList.toggle('open');
+      toggle.textContent = open ? '- hide alternative' : '+ add alternative';
+      if(open) altInput.focus();
+    });
+
+    main.appendChild(toggle);
+    main.appendChild(altBox);
+
+    item._altInput = altInput;
+    item._altBox = altBox;
+    item._altToggle = toggle;
+  }
+
+  row.appendChild(cb);
+  row.appendChild(main);
+  item._checkbox = cb;
+  item._row = row;
+  item._nameEl = nameEl;
+
+  return row;
+}
+
+DATA.forEach((section, sIdx) => {
+  const sec = document.createElement('div');
+  sec.className = 'section';
+
+  const head = document.createElement('div');
+  head.className = 'section-head';
+  head.innerHTML = `<span>${section.name}</span><span class="count" id="count-${sIdx}"></span>`;
+  sec.appendChild(head);
+
+  section.items.forEach(item => sec.appendChild(buildItem(item, sIdx)));
+
+  if(section.optional && section.optional.length){
+    const lbl = document.createElement('div');
+    lbl.className = 'optional-label';
+    lbl.textContent = 'Optional';
+    sec.appendChild(lbl);
+    section.optional.forEach(item => sec.appendChild(buildItem(item, sIdx)));
+  }
+
+  sectionsEl.appendChild(sec);
+});
+
+function allItems(){
+  const out = [];
+  DATA.forEach(s => {
+    s.items.forEach(i => out.push(i));
+    if(s.optional) s.optional.forEach(i => out.push(i));
+  });
+  return out;
+}
+
+function updateProgress(){
+  const items = allItems().filter(i => !i._isCrew);
+  const total = items.length;
+  const checked = items.filter(i => state[i._id].checked).length;
+  document.getElementById('progressNum').textContent = `${checked} / ${total} packed`;
+  document.getElementById('trailFill').style.width = total ? (checked/total*100) + '%' : '0%';
+
+  DATA.forEach((s, idx) => {
+    const its = [...s.items, ...(s.optional||[])];
+    const c = its.filter(i => state[i._id].checked).length;
+    const t = its.length;
+    document.getElementById('count-'+idx).textContent = `${c}/${t}`;
+  });
+}
+
+const STORAGE_KEY = 'philmont-packing-checklist-v1';
+const hasCloudStorage = (typeof window.storage !== 'undefined' && window.storage && typeof window.storage.set === 'function');
+
+async function saveState(){
+  const noteEl = document.getElementById('saveNote');
+  try{
+    if(hasCloudStorage){
+      await window.storage.set(STORAGE_KEY, JSON.stringify(state), false);
+    }else{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+    noteEl.textContent = 'Saved';
+    clearTimeout(saveState._t);
+    saveState._t = setTimeout(() => { noteEl.textContent = ''; }, 1200);
+  }catch(e){
+    noteEl.textContent = "Couldn't save — changes may not persist.";
+  }
+}
+
+async function loadState(){
+  try{
+    let raw = null;
+    if(hasCloudStorage){
+      const result = await window.storage.get(STORAGE_KEY, false);
+      raw = result ? result.value : null;
+    }else{
+      raw = localStorage.getItem(STORAGE_KEY);
+    }
+    if(raw){
+      const saved = JSON.parse(raw);
+      allItems().forEach(item => {
+        const s = saved[item._id];
+        if(s){
+          state[item._id] = s;
+          item._checkbox.checked = !!s.checked;
+          item._row.classList.toggle('checked', !!s.checked);
+          item._nameEl.classList.toggle('checked', !!s.checked);
+          if(item._altInput && s.alt){
+            item._altInput.value = s.alt;
+            item._altBox.classList.add('open');
+            item._altToggle.textContent = '- hide alternative';
+          }
+        }
+      });
+    }
+  }catch(e){
+  }
+  updateProgress();
+}
+
+document.getElementById('exportBtn').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'packing-checklist-backup.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById('importBtn').addEventListener('click', () => {
+  document.getElementById('importFile').click();
+});
+
+document.getElementById('importFile').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async (evt) => {
+    try{
+      const saved = JSON.parse(evt.target.result);
+      allItems().forEach(item => {
+        const s = saved[item._id];
+        if(s){
+          state[item._id] = s;
+          item._checkbox.checked = !!s.checked;
+          item._row.classList.toggle('checked', !!s.checked);
+          item._nameEl.classList.toggle('checked', !!s.checked);
+          if(item._altInput){
+            item._altInput.value = s.alt || '';
+            if(s.alt){
+              item._altBox.classList.add('open');
+              item._altToggle.textContent = '- hide alternative';
+            }
+          }
+        }
+      });
+      updateProgress();
+      await saveState();
+      const noteEl = document.getElementById('saveNote');
+      noteEl.textContent = 'Backup imported';
+      setTimeout(() => { noteEl.textContent = ''; }, 1800);
+    }catch(err){
+      alert("Couldn't read that backup file.");
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+document.getElementById('saveBtn').addEventListener('click', async () => {
+  const noteEl = document.getElementById('saveNote');
+  await saveState();
+  noteEl.textContent = 'All progress saved';
+  clearTimeout(saveState._t);
+  saveState._t = setTimeout(() => { noteEl.textContent = ''; }, 1800);
+});
+
+document.getElementById('resetBtn').addEventListener('click', async () => {
+  allItems().forEach(item => {
+    state[item._id].checked = false;
+    item._checkbox.checked = false;
+    item._row.classList.remove('checked');
+    item._nameEl.classList.remove('checked');
+  });
+  updateProgress();
+  await saveState();
+});
+
+loadState();
+</script>
+</body>
+</html>
